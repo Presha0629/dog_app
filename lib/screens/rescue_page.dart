@@ -1,6 +1,8 @@
+import 'package:dog_app/providers/rescue_list_provider.dart';
 import 'package:dog_app/reusable_widgets/reusable_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:dog_app/entities/dogs.dart';
+import 'package:provider/provider.dart';
 
 class RescuePage extends StatefulWidget {
   const RescuePage({super.key});
@@ -16,18 +18,25 @@ class _RescuePageState extends State<RescuePage> {
   final TextEditingController _breedInputController = TextEditingController();
   final TextEditingController _conditionInputController =
       TextEditingController();
-  List<Dog> dogs = <Dog>[
-    Dog("Balkot", "assets/images/adopt.webp", "Male", "Labrador", "wounded"),
-    Dog("Deerwalk", "assets/images/adopt.webp", "Female", "street",
-        "broken legs")
-  ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Rescue Page")),
-      body: RescueList(
-        dogs: dogs,
+      appBar: AppBar(
+        title: const Text("Rescue Page"),
+        actions: [
+          Center(
+            child: Text(
+              "No of Dogs = ${Provider.of<RescueListProvider>(context, listen: false).dogsCount}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ),
+        ],
+      ),
+      body: Consumer<RescueListProvider>(
+        builder: (context, value, child) => RescueList(
+          dogs: value.dogs,
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -67,19 +76,19 @@ class _RescuePageState extends State<RescuePage> {
                         ),
                         child: const Text("Submit"),
                         onPressed: () {
-                          setState(() {
-                            dogs.add(Dog(
-                                _locationInputController.text,
-                                "assets/images/adopt.webp",
-                                _sexInputController.text,
-                                _breedInputController.text,
-                                _conditionInputController.text));
-                          });
+                          Provider.of<RescueListProvider>(context,
+                                  listen: false)
+                              .addDog(
+                                  _locationInputController.text,
+                                  "assets/images/adopt.webp",
+                                  _sexInputController.text,
+                                  _breedInputController.text,
+                                  _conditionInputController.text);
+                          Navigator.of(context).pop();
                           _locationInputController.text = "";
                           _sexInputController.text = "";
                           _breedInputController.text = "";
                           _conditionInputController.text = "";
-                          Navigator.of(context).pop();
                         },
                       ),
                     ]);
@@ -108,6 +117,25 @@ class _RescueListState extends State<RescueList> {
           leading: Image.asset(widget.dogs[index].image),
           title: Text(widget.dogs[index].location),
           subtitle: Text(widget.dogs[index].condition),
+          tileColor: const Color.fromARGB(255, 246, 173, 173),
+          trailing: SizedBox(
+            width: 50,
+            child: Row(
+              children: <Widget>[
+                IconButton(
+                  icon: const Icon(
+                    Icons.delete,
+                    color: Color.fromARGB(255, 14, 13, 13),
+                  ),
+                  onPressed: () {
+                    // removed customer
+                    Provider.of<RescueListProvider>(context, listen: false)
+                        .removeDog(widget.dogs[index]);
+                  },
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
