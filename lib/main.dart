@@ -3,13 +3,15 @@ import 'package:dog_app/screens/signin_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:dog_app/providers/adoption_list_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
   runApp(MultiProvider(providers: [
-    ChangeNotifierProvider(create: (context) => RescueListProvider())
+    ChangeNotifierProvider(create: (context) => RescueListProvider()),
+    ChangeNotifierProvider(create: (context) => AdoptionListProvider())
   ], child: const MyApp()));
 }
 

@@ -48,8 +48,8 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(
                       height: 20,
                     ),
-                    signInSignUpButton(context, true, () {
-                      FirebaseAuth.instance
+                    signInSignUpButton(context, true, () async {
+                      await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
                               email: _emailTextController.text,
                               password: _passwordTextController.text)

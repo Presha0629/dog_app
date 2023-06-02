@@ -27,8 +27,8 @@ class _RescuePageState extends State<RescuePage> {
         actions: [
           Center(
             child: Text(
-              "No of Dogs = ${Provider.of<RescueListProvider>(context, listen: false).dogsCount}",
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              "No of Dogs = ${Provider.of<RescueListProvider>(context, listen: true).dogsCount}",
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
             ),
           ),
         ],
@@ -41,58 +41,59 @@ class _RescuePageState extends State<RescuePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                    title: const Text("Enter the details: "),
-                    content: Column(
-                      children: <Widget>[
-                        reusableTextField("Location", Icons.location_pin, false,
-                            _locationInputController),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        reusableTextField("Condition", Icons.local_hospital,
-                            false, _conditionInputController),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        reusableTextField(
-                            "Sex", Icons.male, false, _sexInputController),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                        reusableTextField("Breed", Icons.type_specimen, false,
-                            _breedInputController),
-                        const SizedBox(
-                          height: 10,
-                        ),
-                      ],
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: const Text("Enter the details: "),
+                content: Column(
+                  children: <Widget>[
+                    reusableTextField("Location", Icons.location_pin, false,
+                        _locationInputController),
+                    const SizedBox(
+                      height: 10,
                     ),
-                    actions: <Widget>[
-                      TextButton(
-                        style: TextButton.styleFrom(
-                          textStyle: Theme.of(context).textTheme.labelLarge,
-                        ),
-                        child: const Text("Submit"),
-                        onPressed: () {
-                          Provider.of<RescueListProvider>(context,
-                                  listen: false)
-                              .addDog(
-                                  _locationInputController.text,
-                                  "assets/images/adopt.webp",
-                                  _sexInputController.text,
-                                  _breedInputController.text,
-                                  _conditionInputController.text);
-                          Navigator.of(context).pop();
-                          _locationInputController.text = "";
-                          _sexInputController.text = "";
-                          _breedInputController.text = "";
-                          _conditionInputController.text = "";
-                        },
-                      ),
-                    ]);
-              });
+                    reusableTextField("Condition", Icons.local_hospital, false,
+                        _conditionInputController),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    reusableTextField(
+                        "Sex", Icons.male, false, _sexInputController),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    reusableTextField("Breed", Icons.type_specimen, false,
+                        _breedInputController),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                  ],
+                ),
+                actions: <Widget>[
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      textStyle: Theme.of(context).textTheme.labelLarge,
+                    ),
+                    child: const Text("Submit"),
+                    onPressed: () {
+                      Provider.of<RescueListProvider>(context, listen: false)
+                          .addDog(
+                              _locationInputController.text,
+                              "assets/images/adopt.webp",
+                              _sexInputController.text,
+                              _breedInputController.text,
+                              _conditionInputController.text);
+                      Navigator.of(context).pop();
+                      _locationInputController.text = "";
+                      _sexInputController.text = "";
+                      _breedInputController.text = "";
+                      _conditionInputController.text = "";
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         },
         child: const Icon(Icons.add),
       ),
