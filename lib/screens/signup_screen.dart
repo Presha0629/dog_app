@@ -1,9 +1,12 @@
 import 'package:dog_app/reusable_widgets/reusable_widget.dart';
-import 'package:dog_app/screens/home_screen.dart';
 import 'package:dog_app/screens/signin_screen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import '../utils/color_utils.dart';
+import 'package:dog_app/screens/home_screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+final List<String> userType = ["User", "Organization"];
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -43,11 +46,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 reusableTextField("Enter Email Id", Icons.person_outline, false,
                     _emailTextController),
+
                 const SizedBox(
                   height: 20,
                 ),
-                reusableTextField("Enter Password", Icons.lock_outlined, true,
+
+                reusableTextField("Enter Password", Icons.lock_outline, true,
                     _passwordTextController),
+
+                const SizedBox(
+                  height: 20,
+                ),
+
+                const UserTypeSelector(),
+
+                // reusableDropdown('Select Option', Icons.arrow_drop_down, [
+                //   'User',
+                //   'Organization',
+                // ], "User", (String newValue) {
+                //   setState(() {
+                //     "User" = newValue; // Update the selected value
+                //   });
+                // });
                 const SizedBox(
                   height: 20,
                 ),
@@ -56,12 +76,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       .createUserWithEmailAndPassword(
                           email: _emailTextController.text,
                           password: _passwordTextController.text)
-                      .then((value) {
+                      .then((value) async {
                     print("Created New Account");
+                    var data = {
+                      "Email": _emailTextController.text,
+                      "Location": "Bandiput",
+                      "Phone Number": "9898989898",
+                      "Type": "type",
+                      "Username": _userNameTextController.text
+                    };
+                    await FirebaseFirestore.instance
+                        .collection("Users")
+                        .add(data)
+                        .whenComplete(
+                            () => debugPrint("DEBUG::Stored to Database"));
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const HomeScreen()));
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()),
+                    );
                   }).onError((error, stackTrace) {
                     print("Error ${error.toString()}");
                   });
@@ -92,6 +125,52 @@ class _SignUpScreenState extends State<SignUpScreen> {
           ),
         )
       ],
+    );
+  }
+}
+
+class UserTypeSelector extends StatefulWidget {
+  const UserTypeSelector({super.key});
+
+  @override
+  State<UserTypeSelector> createState() => _UserTypeSelectorState();
+}
+
+class _UserTypeSelectorState extends State<UserTypeSelector> {
+  String currentValue = userType[0];
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField<String>(
+      items: userType.map((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList(),
+      value: currentValue,
+      onChanged: (String? value) {
+        setState(() {
+          currentValue = value!;
+        });
+      },
+      decoration: InputDecoration(
+        prefixIcon: const Icon(
+          Icons.widgets,
+          color: Color.fromARGB(179, 16, 15, 15),
+        ),
+        labelText: "text",
+        labelStyle: TextStyle(
+          color: const Color.fromARGB(255, 16, 16, 16).withOpacity(0.9),
+        ),
+        filled: true,
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        fillColor: const Color.fromARGB(255, 249, 247, 247).withOpacity(0.3),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+        ),
+      ),
     );
   }
 }

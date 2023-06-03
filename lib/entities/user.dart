@@ -1,8 +1,9 @@
 class User {
-  final String _UserName;
-  final String _PhoneNo;
+  final String _userName;
+  final String _email;
+  final String _type;
 
-  User(this._UserName, this._PhoneNo);
+  User(this._userName, this._email, this._type);
 
   bool AddToRescueList() {
     return true;

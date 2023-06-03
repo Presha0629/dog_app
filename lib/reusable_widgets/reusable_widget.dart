@@ -20,22 +20,25 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     autocorrect: !isPasswordType,
     cursorColor: Colors.white,
     style: TextStyle(
-        color: const Color.fromARGB(255, 15, 15, 15).withOpacity(0.9)),
+      color: const Color.fromARGB(255, 15, 15, 15).withOpacity(0.9),
+    ),
     decoration: InputDecoration(
-        prefixIcon: Icon(
-          icon,
-          color: const Color.fromARGB(179, 16, 15, 15),
-        ),
-        labelText: text,
-        labelStyle: TextStyle(
-            color: const Color.fromARGB(255, 16, 16, 16).withOpacity(0.9)),
-        filled: true,
-        floatingLabelBehavior: FloatingLabelBehavior.never,
-        fillColor: const Color.fromARGB(255, 249, 247, 247).withOpacity(0.3),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0),
-          borderSide: const BorderSide(width: 0, style: BorderStyle.none),
-        )),
+      prefixIcon: Icon(
+        icon,
+        color: const Color.fromARGB(179, 16, 15, 15),
+      ),
+      labelText: text,
+      labelStyle: TextStyle(
+        color: const Color.fromARGB(255, 16, 16, 16).withOpacity(0.9),
+      ),
+      filled: true,
+      floatingLabelBehavior: FloatingLabelBehavior.never,
+      fillColor: const Color.fromARGB(255, 249, 247, 247).withOpacity(0.3),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(30.0),
+        borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+      ),
+    ),
     keyboardType: isPasswordType
         ? TextInputType.visiblePassword
         : TextInputType.emailAddress,
@@ -71,3 +74,36 @@ Container signInSignUpButton(
     ),
   );
 }
+
+// Widget reusableDropdown(String text, IconData icon, List<String> items,
+//     String selectedValue, Function(String) onChanged) {
+//   return DropdownButtonFormField<String>(
+//     value: selectedValue,
+//     onChanged:(String? value) {
+//       cur = 
+//     },
+//     decoration: InputDecoration(
+//       prefixIcon: Icon(
+//         icon,
+//         color: const Color.fromARGB(179, 16, 15, 15),
+//       ),
+//       labelText: text,
+//       labelStyle: TextStyle(
+//         color: const Color.fromARGB(255, 16, 16, 16).withOpacity(0.9),
+//       ),
+//       filled: true,
+//       floatingLabelBehavior: FloatingLabelBehavior.never,
+//       fillColor: const Color.fromARGB(255, 249, 247, 247).withOpacity(0.3),
+//       border: OutlineInputBorder(
+//         borderRadius: BorderRadius.circular(30.0),
+//         borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+//       ),
+//     ),
+//     items: items.map((String value) {
+//       return DropdownMenuItem<String>(
+//         value: value,
+//         child: Text(value),
+//       );
+//     }).toList(),
+//   );
+// }

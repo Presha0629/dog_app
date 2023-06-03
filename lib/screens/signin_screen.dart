@@ -1,7 +1,10 @@
+import 'package:dog_app/providers/user_provider.dart';
 import 'package:dog_app/screens/home_screen.dart';
 import 'package:dog_app/screens/signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 import '../reusable_widgets/reusable_widget.dart';
 import '../utils/color_utils.dart';
@@ -53,7 +56,16 @@ class _SignInScreenState extends State<SignInScreen> {
                           .signInWithEmailAndPassword(
                               email: _emailTextController.text,
                               password: _passwordTextController.text)
-                          .then((value) {
+                          .then((value) async {
+                        var user = await FirebaseFirestore.instance
+                            .collection("Users")
+                            .doc(_emailTextController.text)
+                            .get();
+                        debugPrint("DEBUG::${user.data()}");
+                        Provider.of<UserProvider>(context, listen: false)
+                            .createUser(user.data()!["Username"],
+                                user.data()!["Email"], user.data()!["Type"]);
+                        debugPrint("DEBUG::UserType= ${user.data()!["Type"]}");
                         Navigator.push(
                             context,
                             MaterialPageRoute(
