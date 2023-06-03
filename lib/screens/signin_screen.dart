@@ -1,4 +1,3 @@
-import 'package:dog_app/providers/user_provider.dart';
 import 'package:dog_app/screens/home_screen.dart';
 import 'package:dog_app/screens/signup_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/user_provider.dart';
 import '../reusable_widgets/reusable_widget.dart';
 import '../utils/color_utils.dart';
 
@@ -19,6 +19,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,27 +53,34 @@ class _SignInScreenState extends State<SignInScreen> {
                       height: 20,
                     ),
                     signInSignUpButton(context, true, () async {
+                      debugPrint("DEBUG::BHaitha");
                       await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
                               email: _emailTextController.text,
                               password: _passwordTextController.text)
                           .then((value) async {
+                        // debugPrint("DEBUG::BHaitha");
                         var user = await FirebaseFirestore.instance
                             .collection("Users")
-                            .doc(_emailTextController.text)
+                            .where("Email",
+                                isEqualTo: _emailTextController.text)
                             .get();
-                        debugPrint("DEBUG::${user.data()}");
+                        debugPrint("DEBUG::${user.docs.first.data()}");
+                        // ignore: use_build_context_synchronously
                         Provider.of<UserProvider>(context, listen: false)
-                            .createUser(user.data()!["Username"],
-                                user.data()!["Email"], user.data()!["Type"]);
-                        debugPrint("DEBUG::UserType= ${user.data()!["Type"]}");
+                            .createUser(
+                                user.docs.first.data()["Username"],
+                                user.docs.first.data()["Email"],
+                                user.docs.first.data()["Type"]);
+                        debugPrint(
+                            "DEBUG::UserType= ${user.docs.first.data()["Type"]}");
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => const HomeScreen()));
                       }).onError((error, stackTrace) {
                         // ignore: avoid_print
-                        print("Error ${error.toString()}");
+                        debugPrint("DEBUG::Error ${error.toString()}");
                       });
                     }),
                     signUpOption()

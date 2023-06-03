@@ -19,8 +19,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _passwordTextController = TextEditingController();
   final TextEditingController _emailTextController = TextEditingController();
   final TextEditingController _userNameTextController = TextEditingController();
+  final TextEditingController _locationTextController = TextEditingController();
+  final TextEditingController _phoneNumberTextController =
+      TextEditingController();
+  String currentValue = userType[0];
+  void changeUserType(String? value) {
+    setState(() {
+      currentValue = value!;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final List<Widget> onlyForOrganization = [
+      const SizedBox(
+        height: 20,
+      ),
+      reusableTextField("Enter Location", Icons.location_city, false,
+          _locationTextController),
+      const SizedBox(
+        height: 20,
+      ),
+      reusableTextField(
+          "Enter Phone Number", Icons.phone, false, _phoneNumberTextController),
+      const SizedBox(
+        height: 20,
+      ),
+    ];
     return Scaffold(
       body: Container(
           width: MediaQuery.of(context).size.width,
@@ -44,21 +69,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 const SizedBox(
                   height: 20,
                 ),
-                reusableTextField("Enter Email Id", Icons.person_outline, false,
-                    _emailTextController),
-
+                reusableTextField(
+                    "Enter Email Id", Icons.email, false, _emailTextController),
                 const SizedBox(
                   height: 20,
                 ),
-
                 reusableTextField("Enter Password", Icons.lock_outline, true,
                     _passwordTextController),
-
                 const SizedBox(
                   height: 20,
                 ),
-
-                const UserTypeSelector(),
+                UserTypeSelector(
+                  currentValue: currentValue,
+                  changeUserType: changeUserType,
+                ),
+                if (currentValue == "Organization") ...onlyForOrganization,
 
                 // reusableDropdown('Select Option', Icons.arrow_drop_down, [
                 //   'User',
@@ -80,9 +105,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     print("Created New Account");
                     var data = {
                       "Email": _emailTextController.text,
-                      "Location": "Bandiput",
-                      "Phone Number": "9898989898",
-                      "Type": "type",
+                      "Location": _locationTextController.text,
+                      "Phone Number": _phoneNumberTextController.text,
+                      "Type": currentValue,
                       "Username": _userNameTextController.text
                     };
                     await FirebaseFirestore.instance
@@ -130,8 +155,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
 }
 
 class UserTypeSelector extends StatefulWidget {
-  const UserTypeSelector({super.key});
-
+  const UserTypeSelector(
+      {required this.currentValue, required this.changeUserType, super.key});
+  final String currentValue;
+  final void Function(String?) changeUserType;
   @override
   State<UserTypeSelector> createState() => _UserTypeSelectorState();
 }
@@ -149,11 +176,7 @@ class _UserTypeSelectorState extends State<UserTypeSelector> {
         );
       }).toList(),
       value: currentValue,
-      onChanged: (String? value) {
-        setState(() {
-          currentValue = value!;
-        });
-      },
+      onChanged: widget.changeUserType,
       decoration: InputDecoration(
         prefixIcon: const Icon(
           Icons.widgets,

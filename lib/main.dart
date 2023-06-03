@@ -1,4 +1,5 @@
 import 'package:dog_app/providers/rescue_list_provider.dart';
+import 'package:dog_app/providers/user_provider.dart';
 import 'package:dog_app/screens/signin_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,8 @@ void main() async {
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => RescueListProvider()),
-    ChangeNotifierProvider(create: (context) => AdoptionListProvider())
+    ChangeNotifierProvider(create: (context) => AdoptionListProvider()),
+    ChangeNotifierProvider(create: (context) => UserProvider())
   ], child: const MyApp()));
 }
 

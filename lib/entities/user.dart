@@ -9,10 +9,6 @@ class User {
     return true;
   }
 
-  // String get PhoneNo => _PhoneNo;
-
-  // String get Location => _Location;
-
   bool adopt() {
     return true;
   }
