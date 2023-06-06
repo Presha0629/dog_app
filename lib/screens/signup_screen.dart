@@ -5,6 +5,8 @@ import '../utils/color_utils.dart';
 import 'package:dog_app/screens/home_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+import 'package:dog_app/providers/user_provider.dart';
 
 final List<String> userType = ["User", "Organization"];
 
@@ -22,6 +24,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _locationTextController = TextEditingController();
   final TextEditingController _phoneNumberTextController =
       TextEditingController();
+
   String currentValue = userType[0];
   void changeUserType(String? value) {
     setState(() {
@@ -40,11 +43,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
       const SizedBox(
         height: 20,
       ),
-      reusableTextField(
-          "Enter Phone Number", Icons.phone, false, _phoneNumberTextController),
-      const SizedBox(
-        height: 20,
-      ),
     ];
     return Scaffold(
       body: Container(
@@ -52,9 +50,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
-            hexStringToColor("EA5A6F"),
-            hexStringToColor("DE791E"),
-            hexStringToColor("FCCF3A")
+            hexStringToColor("#7EE8FA"),
+            hexStringToColor("#EEC0C6"),
+            hexStringToColor("7EE8FA")
           ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
           child: SingleChildScrollView(
               child: Padding(
@@ -76,6 +74,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 ),
                 reusableTextField("Enter Password", Icons.lock_outline, true,
                     _passwordTextController),
+                const SizedBox(
+                  height: 20,
+                ),
+
+                reusableTextField("Enter Phone Number", Icons.phone, false,
+                    _phoneNumberTextController),
                 const SizedBox(
                   height: 20,
                 ),
@@ -102,19 +106,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           email: _emailTextController.text,
                           password: _passwordTextController.text)
                       .then((value) async {
-                    print("Created New Account");
+                    debugPrint("Created New Account");
                     var data = {
                       "Email": _emailTextController.text,
                       "Location": _locationTextController.text,
                       "Phone Number": _phoneNumberTextController.text,
                       "Type": currentValue,
-                      "Username": _userNameTextController.text
+                      "Username": _userNameTextController.text,
                     };
                     await FirebaseFirestore.instance
                         .collection("Users")
                         .add(data)
-                        .whenComplete(
-                            () => debugPrint("DEBUG::Stored to Database"));
+                        .whenComplete(() {
+                      debugPrint("DEBUG::Stored to Database");
+                      Provider.of<UserProvider>(context, listen: false)
+                          .createUser(
+                              _userNameTextController.text,
+                              _emailTextController.text,
+                              currentValue,
+                              _phoneNumberTextController.text,
+                              _locationTextController.text);
+                    });
+
                     Navigator.push(
                       context,
                       MaterialPageRoute(

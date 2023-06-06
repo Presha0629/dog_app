@@ -3,7 +3,13 @@ import 'package:flutter/material.dart';
 
 class UserProvider extends ChangeNotifier {
   User? _user;
-  void createUser(String name, String email, String type) {
-    _user = User(name, email, type);
+  User? get user => _user;
+
+  @override
+  notifyListeners();
+
+  void createUser(String name, String email, String type, String phoneNumber,
+      String location) {
+    _user = User(name, email, type, phoneNumber, location);
   }
 }

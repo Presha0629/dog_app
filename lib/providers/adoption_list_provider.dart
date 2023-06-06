@@ -5,8 +5,9 @@ class AdoptionListProvider extends ChangeNotifier {
   final List<Dog> _dogs = <Dog>[];
   List<Dog> get dogs => _dogs;
   int get dogsCount => _dogs.length;
-  void addDog(String image, String sex, String breed, String condition) {
-    _dogs.add(Dog("", image, sex, breed, condition));
+  void addDog(
+      String image, String sex, String breed, String condition, String email) {
+    _dogs.add(Dog("", image, sex, breed, condition, email));
     notifyListeners();
   }
 

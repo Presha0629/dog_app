@@ -18,18 +18,18 @@ TextField reusableTextField(String text, IconData icon, bool isPasswordType,
     obscureText: isPasswordType,
     enableSuggestions: !isPasswordType,
     autocorrect: !isPasswordType,
-    cursorColor: Colors.white,
+    cursorColor: const Color.fromARGB(255, 15, 15, 15),
     style: TextStyle(
       color: const Color.fromARGB(255, 15, 15, 15).withOpacity(0.9),
     ),
     decoration: InputDecoration(
       prefixIcon: Icon(
         icon,
-        color: const Color.fromARGB(179, 16, 15, 15),
+        color: const Color.fromARGB(255, 5, 5, 5),
       ),
       labelText: text,
       labelStyle: TextStyle(
-        color: const Color.fromARGB(255, 16, 16, 16).withOpacity(0.9),
+        color: const Color.fromARGB(255, 5, 5, 5).withOpacity(0.9),
       ),
       filled: true,
       floatingLabelBehavior: FloatingLabelBehavior.never,

@@ -2,8 +2,10 @@ class OrganizationUser {
   final String _OrgName;
   final String _PhoneNo;
   final String _Location;
+  final String _phoneNumber;
 
-  OrganizationUser(this._OrgName, this._PhoneNo, this._Location);
+  OrganizationUser(
+      this._OrgName, this._PhoneNo, this._Location, this._phoneNumber);
 
   bool AddToAdoptList() {
     return true;

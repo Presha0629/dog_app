@@ -28,9 +28,9 @@ class _SignInScreenState extends State<SignInScreen> {
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
               gradient: LinearGradient(colors: [
-            hexStringToColor("EA5A6F"),
-            hexStringToColor("DE791E"),
-            hexStringToColor("FCCF3A")
+            hexStringToColor("#7EE8FA"),
+            hexStringToColor("#EEC0C6"),
+            hexStringToColor("7EE8FA")
           ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
           child: SingleChildScrollView(
             child: Padding(
@@ -38,7 +38,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     20, MediaQuery.of(context).size.height * 0.2, 20, 0),
                 child: Column(
                   children: <Widget>[
-                    logoWidget(imagePath: 'assets/images/logo.png'),
+                    logoWidget(imagePath: 'assets/images/doglogo2.png'),
                     const SizedBox(
                       height: 30,
                     ),
@@ -53,27 +53,29 @@ class _SignInScreenState extends State<SignInScreen> {
                       height: 20,
                     ),
                     signInSignUpButton(context, true, () async {
-                      debugPrint("DEBUG::BHaitha");
+                      debugPrint("DEBUG::");
                       await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
                               email: _emailTextController.text,
                               password: _passwordTextController.text)
                           .then((value) async {
-                        // debugPrint("DEBUG::BHaitha");
                         var user = await FirebaseFirestore.instance
                             .collection("Users")
                             .where("Email",
                                 isEqualTo: _emailTextController.text)
                             .get();
-                        debugPrint("DEBUG::${user.docs.first.data()}");
+                        debugPrint("DEBUG:: Signin ma User = ${user.docs}");
                         // ignore: use_build_context_synchronously
                         Provider.of<UserProvider>(context, listen: false)
                             .createUser(
                                 user.docs.first.data()["Username"],
                                 user.docs.first.data()["Email"],
-                                user.docs.first.data()["Type"]);
+                                user.docs.first.data()["Type"],
+                                user.docs.first.data()["Phone Number"],
+                                user.docs.first.data()["Location"]);
                         debugPrint(
                             "DEBUG::UserType= ${user.docs.first.data()["Type"]}");
+
                         Navigator.push(
                             context,
                             MaterialPageRoute(

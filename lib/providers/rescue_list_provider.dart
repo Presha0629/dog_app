@@ -8,8 +8,8 @@ class RescueListProvider extends ChangeNotifier {
   int get dogsCount => _dogs.length;
 
   void addDog(String location, String image, String sex, String breed,
-      String condition) {
-    _dogs.add(Dog(location, image, sex, breed, condition));
+      String condition, String email) {
+    _dogs.add(Dog(location, image, sex, breed, condition, email));
     notifyListeners();
   }
 

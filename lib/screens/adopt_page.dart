@@ -1,8 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dog_app/entities/user.dart';
 import 'package:dog_app/providers/adoption_list_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:dog_app/entities/dogs.dart';
 import 'package:dog_app/reusable_widgets/reusable_widget.dart';
+
+import '../providers/user_provider.dart';
 
 class AdoptionPage extends StatefulWidget {
   const AdoptionPage({super.key});
@@ -18,9 +22,11 @@ class _AdoptionPageState extends State<AdoptionPage> {
       TextEditingController();
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserProvider>(context, listen: false).user!;
     return Scaffold(
       appBar: AppBar(
         title: const Text("Adoption Page"),
+        backgroundColor: const Color.fromARGB(49, 32, 54, 65),
         actions: [
           Center(
             child: Text(
@@ -32,60 +38,70 @@ class _AdoptionPageState extends State<AdoptionPage> {
       ),
       body: Consumer<AdoptionListProvider>(
         builder: (context, value, index) {
-          return AdoptList(dogs: value.dogs);
+          return AdoptList(user: user, dogs: value.dogs);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: const Text("Enter the details: "),
-                content: Column(
-                  children: <Widget>[
-                    reusableTextField("Condition", Icons.local_hospital, false,
-                        _conditionInputController),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    reusableTextField(
-                        "Sex", Icons.male, false, _sexInputController),
-                    const SizedBox(
-                      height: 10,
-                    ),
-                    reusableTextField("Breed", Icons.type_specimen, false,
-                        _breedInputController),
-                    const SizedBox(
-                      height: 10,
+      floatingActionButton: Visibility(
+        visible: user.type == "Organization",
+        child: FloatingActionButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: const Text("Enter the details: "),
+                  content: Column(
+                    children: <Widget>[
+                      reusableTextField("Condition", Icons.local_hospital,
+                          false, _conditionInputController),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      reusableTextField(
+                          "Sex", Icons.male, false, _sexInputController),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      reusableTextField("Breed", Icons.type_specimen, false,
+                          _breedInputController),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                    ],
+                  ),
+                  actions: <Widget>[
+                    TextButton(
+                      style: TextButton.styleFrom(
+                        textStyle: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      child: const Text("Submit"),
+                      onPressed: () {
+                        Provider.of<AdoptionListProvider>(context,
+                                listen: false)
+                            .addDog(
+                                "assets/images/adopt.webp",
+                                _sexInputController.text,
+                                _breedInputController.text,
+                                _conditionInputController.text,
+                                Provider.of<UserProvider>(context,
+                                        listen: false)
+                                    .user!
+                                    .email);
+                        Navigator.of(context).pop();
+                        _sexInputController.text = "";
+                        _breedInputController.text = "";
+                        _conditionInputController.text = "";
+                      },
                     ),
                   ],
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    style: TextButton.styleFrom(
-                      textStyle: Theme.of(context).textTheme.labelLarge,
-                    ),
-                    child: const Text("Submit"),
-                    onPressed: () {
-                      Provider.of<AdoptionListProvider>(context, listen: false)
-                          .addDog(
-                              "assets/images/adopt.webp",
-                              _sexInputController.text,
-                              _breedInputController.text,
-                              _conditionInputController.text);
-                      Navigator.of(context).pop();
-                      _sexInputController.text = "";
-                      _breedInputController.text = "";
-                      _conditionInputController.text = "";
-                    },
-                  ),
-                ],
-              );
-            },
-          );
-        },
-        child: const Icon(Icons.add),
+                );
+              },
+            );
+          },
+          child: Visibility(
+              visible: user.type == "Organization",
+              child: const Icon(Icons.add)),
+        ),
       ),
     );
   }
@@ -94,8 +110,10 @@ class _AdoptionPageState extends State<AdoptionPage> {
 class AdoptList extends StatefulWidget {
   const AdoptList({
     required this.dogs,
+    required this.user,
     super.key,
   });
+  final User user;
   final List<Dog> dogs;
 
   @override
@@ -112,12 +130,14 @@ class _AdoptListState extends State<AdoptList> {
             leading: Image.asset(widget.dogs[index].image),
             title: Text(widget.dogs[index].breed),
             subtitle: Text(widget.dogs[index].sex),
-            tileColor: const Color.fromARGB(255, 246, 173, 173),
-            trailing: SizedBox(
-              width: 50,
-              child: Row(
-                children: <Widget>[
-                  IconButton(
+            tileColor: const Color.fromARGB(255, 166, 200, 220),
+            trailing: Visibility(
+              visible: widget.user.type == "Organization",
+              child: Visibility(
+                visible: widget.user.email == widget.dogs[index].email,
+                child: SizedBox(
+                  width: 50,
+                  child: IconButton(
                     icon: const Icon(
                       Icons.delete,
                       color: Color.fromARGB(255, 14, 13, 13),
@@ -128,10 +148,44 @@ class _AdoptListState extends State<AdoptList> {
                           .removeDog(widget.dogs[index]);
                     },
                   ),
-                ],
+                ),
               ),
             ),
+            onTap: () {
+              showDetails(context, widget.dogs[index]);
+            },
           );
         });
+  }
+
+  void showDetails(BuildContext context, Dog dog) async {
+    final textStyle = Theme.of(context).textTheme.titleLarge;
+    final user = await FirebaseFirestore.instance
+        .collection("Users")
+        .where("Email", isEqualTo: dog.email)
+        .get();
+    final phoneNumber = user.docs.first.data()["Phone Number"];
+    debugPrint("DEBUG:: DATA = ${dog.email}");
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return (AlertDialog(
+          title: const Text("Details"),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.asset(dog.image),
+              Text("Breed:${dog.breed}", style: textStyle),
+              Text("Sex:${dog.sex}", style: textStyle),
+              Text("Condition:${dog.condition}", style: textStyle),
+              Text(
+                "Phone No: $phoneNumber",
+                style: textStyle,
+              )
+            ],
+          ),
+        ));
+      },
+    );
   }
 }

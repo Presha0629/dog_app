@@ -1,6 +1,9 @@
+import 'package:dog_app/providers/user_provider.dart';
 import 'package:dog_app/screens/donate_page.dart';
 import 'package:dog_app/screens/rescue_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:dog_app/entities/user.dart';
 
 import 'package:dog_app/utils/color_utils.dart';
 import 'package:dog_app/screens/adopt_page.dart';
@@ -10,18 +13,29 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final userData = Provider.of<UserProvider>(context);
+    final User user = userData.user!;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: (user.type == "User"
+            ? const Text("User Dashboard")
+            : const Text("Organization Dashboard")),
+        backgroundColor: const Color.fromARGB(49, 56, 78, 94),
       ),
       body: const DashBoard(),
     );
   }
 }
 
-class DashBoard extends StatelessWidget {
+class DashBoard extends StatefulWidget {
   const DashBoard({Key? key}) : super(key: key);
 
+  @override
+  State<DashBoard> createState() => _DashBoardState();
+}
+
+class _DashBoardState extends State<DashBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,9 +44,9 @@ class DashBoard extends StatelessWidget {
       height: MediaQuery.of(context).size.height,
       decoration: BoxDecoration(
           gradient: LinearGradient(colors: [
-        hexStringToColor("EA5A6F"),
-        hexStringToColor("DE791E"),
-        hexStringToColor("FCCF3A")
+        hexStringToColor("#7EE8FA"),
+        hexStringToColor("#EEC0C6"),
+        hexStringToColor("7EE8FA")
       ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
       child: const Column(
         // mainAxisAlignment: MainAxisAlignment.center,
@@ -85,7 +99,7 @@ class MyCard extends StatelessWidget {
         }
       },
       child: SizedBox(
-        width: 250,
+        width: 200,
         height: 200,
         child: Column(
           children: [Image.asset(imagePath), Text(title)],
