@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dog_app/entities/user.dart';
 import 'package:dog_app/providers/adoption_list_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:dog_app/entities/dogs.dart';
 import 'package:dog_app/reusable_widgets/reusable_widget.dart';
@@ -20,6 +23,20 @@ class _AdoptionPageState extends State<AdoptionPage> {
   final TextEditingController _breedInputController = TextEditingController();
   final TextEditingController _conditionInputController =
       TextEditingController();
+
+  File? _image;
+  Future getImage(bool isCamera) async {
+    XFile? image;
+    if (isCamera) {
+      image = await ImagePicker().pickImage(source: ImageSource.camera);
+    } else {
+      image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    }
+    setState(() {
+      _image = image == null ? null : File(image.path);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserProvider>(context, listen: false).user!;
@@ -67,6 +84,30 @@ class _AdoptionPageState extends State<AdoptionPage> {
                       const SizedBox(
                         height: 10,
                       ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            onPressed: () {
+                              getImage(false);
+                            },
+                            icon: const Icon(Icons.file_upload),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              getImage(true);
+                            },
+                            icon: const Icon(Icons.camera_alt),
+                          ),
+                          _image == null
+                              ? Container()
+                              : Image.file(
+                                  _image!,
+                                  height: 50,
+                                  width: 50,
+                                ),
+                        ],
+                      ),
                     ],
                   ),
                   actions: <Widget>[
@@ -75,11 +116,26 @@ class _AdoptionPageState extends State<AdoptionPage> {
                         textStyle: Theme.of(context).textTheme.labelLarge,
                       ),
                       child: const Text("Submit"),
-                      onPressed: () {
+                      onPressed: () async {
+                        var data = {
+                          "Breed": _breedInputController.text,
+                          "Condition": _conditionInputController.text,
+                          "Sex": _sexInputController.text,
+                          "User Email":
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .user!
+                                  .email
+                        };
+                        await FirebaseFirestore.instance
+                            .collection("AdoptionList")
+                            .add(data)
+                            .whenComplete(() {
+                          debugPrint("DEBUG::Stored to AdoptionListDatabase");
+                        });
                         Provider.of<AdoptionListProvider>(context,
                                 listen: false)
                             .addDog(
-                                "assets/images/adopt.webp",
+                                _image,
                                 _sexInputController.text,
                                 _breedInputController.text,
                                 _conditionInputController.text,
@@ -91,6 +147,7 @@ class _AdoptionPageState extends State<AdoptionPage> {
                         _sexInputController.text = "";
                         _breedInputController.text = "";
                         _conditionInputController.text = "";
+                        _image = null;
                       },
                     ),
                   ],
@@ -127,7 +184,7 @@ class _AdoptListState extends State<AdoptList> {
         itemCount: widget.dogs.length,
         itemBuilder: (context, index) {
           return ListTile(
-            leading: Image.asset(widget.dogs[index].image),
+            leading: widget.dogs[index].image,
             title: Text(widget.dogs[index].breed),
             subtitle: Text(widget.dogs[index].sex),
             tileColor: const Color.fromARGB(255, 166, 200, 220),
@@ -174,7 +231,7 @@ class _AdoptListState extends State<AdoptList> {
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(dog.image),
+              dog.image,
               Text("Breed:${dog.breed}", style: textStyle),
               Text("Sex:${dog.sex}", style: textStyle),
               Text("Condition:${dog.condition}", style: textStyle),

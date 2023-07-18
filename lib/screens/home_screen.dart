@@ -21,7 +21,19 @@ class HomeScreen extends StatelessWidget {
         title: (user.type == "User"
             ? const Text("User Dashboard")
             : const Text("Organization Dashboard")),
-        backgroundColor: const Color.fromARGB(49, 56, 78, 94),
+        backgroundColor: const Color.fromARGB(48, 66, 76, 79),
+        // actions: [
+        //   ElevatedButton(
+        //     onPressed: () async {
+        //       await firebase_auth.FirebaseAuth.instance.signOut();
+        //       userData.signOut();
+        //     },
+        //     child: const Text(
+        //       'Sign Out',
+        //       style: TextStyle(backgroundColor:Color.fromARGB(5, 5, 5, 5)),
+        //     ),
+        //   ),
+        // ],
       ),
       body: const DashBoard(),
     );
@@ -48,30 +60,32 @@ class _DashBoardState extends State<DashBoard> {
         hexStringToColor("#EEC0C6"),
         hexStringToColor("7EE8FA")
       ], begin: Alignment.topCenter, end: Alignment.bottomCenter)),
-      child: const Column(
-        // mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          MyCard(
-            imagePath: 'assets/images/Rescue_image.jfif',
-            title: 'Rescue',
-          ),
-          SizedBox(
-            width: 15,
-            height: 15,
-          ),
-          MyCard(
-            imagePath: 'assets/images/adopt3.jfif',
-            title: 'Adopt',
-          ),
-          SizedBox(
-            width: 15,
-            height: 15,
-          ),
-          MyCard(
-            imagePath: 'assets/images/donate2.jfif',
-            title: 'Donation',
-          )
-        ],
+      child: const SingleChildScrollView(
+        child: Column(
+          // mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            MyCard(
+              imagePath: 'assets/images/Rescue_image.jfif',
+              title: 'Rescue',
+            ),
+            SizedBox(
+              width: 15,
+              height: 15,
+            ),
+            MyCard(
+              imagePath: 'assets/images/adopt3.jfif',
+              title: 'Adopt',
+            ),
+            SizedBox(
+              width: 15,
+              height: 15,
+            ),
+            MyCard(
+              imagePath: 'assets/images/donate2.jfif',
+              title: 'Donation',
+            ),
+          ],
+        ),
       ),
     ));
   }
@@ -102,39 +116,22 @@ class MyCard extends StatelessWidget {
         width: 200,
         height: 200,
         child: Column(
-          children: [Image.asset(imagePath), Text(title)],
+          children: [
+            Image.asset(imagePath),
+            const SizedBox(
+              width: 15,
+              height: 15,
+            ),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            )
+          ],
         ),
       ),
     ));
   }
 }
-
-
-// class HomeScreen extends StatefulWidget {
-//   const HomeScreen({super.key});
-
-//   @override
-//   State<HomeScreen> createState() => _HomeScreenState();
-// }
-
-// class _HomeScreenState extends State<HomeScreen> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       body: Center(
-//         child: ElevatedButton(
-//           child: const Text("Logout"),
-//           onPressed: () {
-//             FirebaseAuth.instance.signOut().then((value) {
-//               print("Signed Out");
-//               Navigator.push(
-//                   context,
-//                   MaterialPageRoute(
-//                       builder: (context) => const SignInScreen()));
-//             });
-//           },
-//         ),
-//       ),
-//     );
-//   }
-// }

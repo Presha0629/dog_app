@@ -12,4 +12,8 @@ class UserProvider extends ChangeNotifier {
       String location) {
     _user = User(name, email, type, phoneNumber, location);
   }
+
+  // void signOut() {
+  //   _user = null;
+  // }
 }

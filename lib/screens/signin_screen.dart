@@ -42,7 +42,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     const SizedBox(
                       height: 30,
                     ),
-                    reusableTextField("Enter Username", Icons.person_outline,
+                    reusableTextField("Enter Email", Icons.person_outline,
                         false, _emailTextController),
                     const SizedBox(
                       height: 20,
@@ -53,7 +53,6 @@ class _SignInScreenState extends State<SignInScreen> {
                       height: 20,
                     ),
                     signInSignUpButton(context, true, () async {
-                      debugPrint("DEBUG::");
                       await FirebaseAuth.instance
                           .signInWithEmailAndPassword(
                               email: _emailTextController.text,
@@ -64,7 +63,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             .where("Email",
                                 isEqualTo: _emailTextController.text)
                             .get();
-                        debugPrint("DEBUG:: Signin ma User = ${user.docs}");
+                        debugPrint("DEBUG:: Signin  = ${user.docs}");
                         // ignore: use_build_context_synchronously
                         Provider.of<UserProvider>(context, listen: false)
                             .createUser(

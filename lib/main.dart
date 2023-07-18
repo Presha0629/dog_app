@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
       title: 'Dog App',
       theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
-              seedColor: const Color.fromARGB(255, 248, 100, 46))),
+              seedColor: const Color.fromARGB(255, 103, 156, 166))),
       home: const SignInScreen(),
     );
   }

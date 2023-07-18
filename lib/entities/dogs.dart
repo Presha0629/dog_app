@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
+
 class Dog {
   final String _Location;
-  final String _Image;
+  final Image _Image;
   final String _Sex;
   final String _Breed;
   final String _Condition;
@@ -10,7 +12,7 @@ class Dog {
       this._email);
 
   String get location => _Location;
-  String get image => _Image;
+  Image get image => _Image;
   String get sex => _Sex;
   String get breed => _Breed;
   String get condition => _Condition;

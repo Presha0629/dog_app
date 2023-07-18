@@ -5,6 +5,8 @@ import 'package:dog_app/reusable_widgets/reusable_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:dog_app/entities/dogs.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 
 import '../entities/user.dart';
 
@@ -22,6 +24,18 @@ class _RescuePageState extends State<RescuePage> {
   final TextEditingController _breedInputController = TextEditingController();
   final TextEditingController _conditionInputController =
       TextEditingController();
+  File? _image;
+  Future getImage(bool isCamera) async {
+    XFile? image;
+    if (isCamera) {
+      image = await ImagePicker().pickImage(source: ImageSource.camera);
+    } else {
+      image = await ImagePicker().pickImage(source: ImageSource.gallery);
+    }
+    setState(() {
+      _image = image == null ? null : File(image.path);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,29 +70,55 @@ class _RescuePageState extends State<RescuePage> {
               builder: (BuildContext context) {
                 return AlertDialog(
                   title: const Text("Enter the details: "),
-                  content: Column(
-                    children: <Widget>[
-                      reusableTextField("Location", Icons.location_pin, false,
-                          _locationInputController),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      reusableTextField("Condition", Icons.local_hospital,
-                          false, _conditionInputController),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      reusableTextField(
-                          "Sex", Icons.male, false, _sexInputController),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      reusableTextField("Breed", Icons.type_specimen, false,
-                          _breedInputController),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                    ],
+                  content: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        reusableTextField("Location", Icons.location_pin, false,
+                            _locationInputController),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        reusableTextField("Condition", Icons.local_hospital,
+                            false, _conditionInputController),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        reusableTextField(
+                            "Sex", Icons.male, false, _sexInputController),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        reusableTextField("Breed", Icons.type_specimen, false,
+                            _breedInputController),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                getImage(false);
+                              },
+                              icon: const Icon(Icons.file_upload),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                getImage(true);
+                              },
+                              icon: const Icon(Icons.camera_alt),
+                            ),
+                            _image == null
+                                ? Container()
+                                : Image.file(
+                                    _image!,
+                                    height: 50,
+                                    width: 50,
+                                  ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                   actions: <Widget>[
                     TextButton(
@@ -86,11 +126,28 @@ class _RescuePageState extends State<RescuePage> {
                         textStyle: Theme.of(context).textTheme.labelLarge,
                       ),
                       child: const Text("Submit"),
-                      onPressed: () {
+                      onPressed: () async {
+                        var data = {
+                          "Breed": _breedInputController.text,
+                          "Condition": _conditionInputController.text,
+                          "Location ": _locationInputController.text,
+                          "Sex": _sexInputController.text,
+                          "User Email":
+                              Provider.of<UserProvider>(context, listen: false)
+                                  .user!
+                                  .email
+                        };
+                        await FirebaseFirestore.instance
+                            .collection("RescueList")
+                            .add(data)
+                            .whenComplete(() {
+                          debugPrint("DEBUG::Stored to RescueListDatabase");
+                        });
+
                         Provider.of<RescueListProvider>(context, listen: false)
                             .addDog(
                                 _locationInputController.text,
-                                "assets/images/adopt.webp",
+                                _image,
                                 _sexInputController.text,
                                 _breedInputController.text,
                                 _conditionInputController.text,
@@ -103,6 +160,7 @@ class _RescuePageState extends State<RescuePage> {
                         _sexInputController.text = "";
                         _breedInputController.text = "";
                         _conditionInputController.text = "";
+                        _image = null;
                       },
                     ),
                   ],
@@ -132,7 +190,7 @@ class _RescueListState extends State<RescueList> {
       itemCount: widget.dogs.length,
       itemBuilder: (context, index) {
         return ListTile(
-          leading: Image.asset(widget.dogs[index].image),
+          leading: widget.dogs[index].image,
           title: Text(widget.dogs[index].location),
           subtitle: Text(widget.dogs[index].condition),
           tileColor: const Color.fromARGB(255, 166, 200, 220),
@@ -179,7 +237,7 @@ class _RescueListState extends State<RescueList> {
           content: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(dog.image),
+              dog.image,
               Text("Breed:${dog.breed}", style: textStyle),
               Text("Sex:${dog.sex}", style: textStyle),
               Text("Condition:${dog.condition}", style: textStyle),
